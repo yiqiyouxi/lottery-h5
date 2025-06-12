@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>彩票出票H5</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>彩票出票模拟器</h1>
+    <label>比赛信息：</label>
+    <textarea id="matchInfo" placeholder="例：第1场 周六001 恒大vs国米 胜@1.80元"></textarea>
+
+    <label>过关方式：</label>
+    <input id="guoguan" type="text" placeholder="如：3x1" />
+
+    <label>倍数：</label>
+    <input id="beishu" type="number" placeholder="如：50" />
+
+    <label>金额：</label>
+    <input id="jine" type="number" placeholder="如：200" />
+
+    <label>打印时间：</label>
+    <input id="time" type="text" placeholder="如：2025/06/12 15:08:00" />
+
+    <button onclick="generateTicket()">生成彩票图片</button>
+
+    <canvas id="ticketCanvas" width="600" height="1000"></canvas>
+  </div>
+  <script src="script.js"></script>
+</body>
+</html>
