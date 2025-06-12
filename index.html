@@ -3,30 +3,35 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>彩票出票H5</title>
+  <title>彩票出票</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
   <div class="container">
-    <h1>彩票出票模拟器</h1>
-    <label>比赛信息：</label>
-    <textarea id="matchInfo" placeholder="例：第1场 周六001 恒大vs国米 胜@1.80元"></textarea>
+    <h1>生成彩票票据</h1>
+
+    <textarea id="matchText" placeholder="请输入比赛信息，例如：
+第1场 周六001 主队：恒大 vs 客队：国米 胜@1.70
+第2场 周六002 主队：拜仁 vs 客队：皇马 负@1.90
+"></textarea>
 
     <label>过关方式：</label>
-    <input id="guoguan" type="text" placeholder="如：3x1" />
+    <input id="guoguan" placeholder="如 2x1" />
 
-    <label>倍数：</label>
-    <input id="beishu" type="number" placeholder="如：50" />
+    <label>金额（元）：</label>
+    <input id="jine" placeholder="如 2" />
 
-    <label>金额：</label>
-    <input id="jine" type="number" placeholder="如：200" />
+    <label>最高奖金（元）：</label>
+    <input id="bonus" placeholder="如 5.98" />
 
-    <label>打印时间：</label>
-    <input id="time" type="text" placeholder="如：2025/06/12 15:08:00" />
+    <label>注数说明：</label>
+    <input id="zhushu" placeholder="如 2x1×1注；共1注" />
 
-    <button onclick="generateTicket()">生成彩票图片</button>
-
-    <canvas id="ticketCanvas" width="600" height="1000"></canvas>
+    <button onclick="generate()">生成票据</button>
+    <br/><br/>
+    <canvas id="canvas" width="600" height="1000"></canvas>
+    <br/>
+    <button onclick="download()">下载图片</button>
   </div>
   <script src="script.js"></script>
 </body>

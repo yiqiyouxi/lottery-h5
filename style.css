@@ -1,34 +1,27 @@
 body {
-  font-family: "Courier New", monospace;
-  background-color: #f8f8f8;
-  margin: 0;
+  font-family: 'Courier New', monospace;
+  background: #f9f9f9;
   padding: 20px;
 }
 
 .container {
-  max-width: 640px;
+  max-width: 600px;
   margin: auto;
 }
 
-label {
-  display: block;
-  margin-top: 10px;
-}
-
-input, textarea {
+textarea, input {
   width: 100%;
-  padding: 8px;
-  margin-bottom: 8px;
+  margin: 8px 0;
+  padding: 10px;
   font-size: 14px;
 }
 
 button {
+  width: 100%;
+  padding: 12px;
   background-color: #d60000;
   color: white;
-  border: none;
-  padding: 10px;
-  width: 100%;
   font-size: 16px;
-  margin-top: 10px;
+  border: none;
   cursor: pointer;
 }
