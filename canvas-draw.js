@@ -4,13 +4,12 @@ function drawTicket(data) {
   const canvas = document.getElementById("ticketCanvas");
   const ctx = canvas.getContext("2d");
 
-  const baseHeight = 300;
+  // 动态高度，根据场次数决定
   const matchHeight = 90;
-  const height = baseHeight + data.matches.length * matchHeight;
-  canvas.width = 600;
-  canvas.height = height;
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  const extraHeight = 300;
+  const totalHeight = extraHeight + data.matches.length * matchHeight;
 
+  // 加载背景图（不拉伸）
   const isShort = data.matches.length <= 2;
   const randomShort = Math.floor(Math.random() * 8) + 1;
   const randomLong = Math.floor(Math.random() * 5) + 1;
@@ -22,47 +21,49 @@ function drawTicket(data) {
   bg.src = bgSrc;
 
   bg.onload = () => {
-    ctx.drawImage(bg, 0, 0, canvas.width, canvas.height);
+    canvas.width = bg.width;
+    canvas.height = bg.height;
+    ctx.drawImage(bg, 0, 0); // 原尺寸绘制背景
 
-    let y = 100;
+    let y = 220; // 避开压条文字
     ctx.fillStyle = "#000";
     ctx.font = "18px Courier New";
-    ctx.fillText(`过关方式 ${data.guoguan}    1倍    合计 ${data.jine}元`, 20, y);
-    y += 30;
+    ctx.fillText(`过关方式 ${data.guoguan}    1倍    合计 ${data.jine}元`, 40, y);
+    y += 36;
 
     ctx.font = "16px Courier New";
     data.matches.forEach((match, i) => {
-      ctx.fillText(`第${i + 1}场 ${match.weekday}${match.code} ${match.let}`, 20, y);
-      y += 22;
-      ctx.fillText(`主队：${match.home} vs 客队：${match.away}`, 20, y);
-      y += 22;
-      ctx.fillText(`${match.bet}@${match.odds}`, 20, y);
-      y += 28;
+      ctx.fillText(`第${i + 1}场 ${match.weekday}${match.code} ${match.let}`, 40, y);
+      y += 24;
+      ctx.fillText(`主队：${match.home} vs 客队：${match.away}`, 40, y);
+      y += 24;
+      ctx.fillText(`${match.bet}@${match.odds}`, 40, y);
+      y += 32;
     });
 
     ctx.font = "14px Courier New";
-    ctx.fillText("（选项固定奖金金额为每1元投注对应的奖金金额）", 20, y);
+    ctx.fillText("（选项固定奖金金额为每1元投注对应的奖金金额）", 40, y);
     y += 22;
-    ctx.fillText(`本票最高可能固定奖金：${data.max_bonus}`, 20, y);
+    ctx.fillText(`本票最高可能固定奖金：${data.max_bonus}`, 40, y);
     y += 22;
-    ctx.fillText(`单倍注数：${data.zhushu_info}`, 20, y);
-    y += 28;
+    ctx.fillText(`单倍注数：${data.zhushu_info}`, 40, y);
+    y += 30;
 
     for (let i = 0; i < 10; i++) {
-      ctx.fillText("********************", 20, y);
+      ctx.fillText("********************", 40, y);
       y += 16;
     }
 
-    ctx.fillText(`感谢您为公益事业贡献 ${data.gongyi}元`, 140, y);
+    ctx.fillText(`感谢您为公益事业贡献 ${data.gongyi}元`, 180, y);
     y += 20;
-    ctx.fillText(`${data.city}`, 240, y);
+    ctx.fillText(`${data.city}`, 280, y);
     y += 20;
-    ctx.fillText(`${data.print_time}`, 400, y);
+    ctx.fillText(`${data.print_time}`, 420, y);
 
     const barcode = new Image();
     barcode.src = "images/barcode/条码图1.png";
     barcode.onload = () => {
-      ctx.drawImage(barcode, 20, y + 5, 560, 50);
+      ctx.drawImage(barcode, 40, y + 5, 520, 60);
     };
   };
 }
