@@ -25,45 +25,45 @@ function drawTicket(data) {
     canvas.height = bg.height;
     ctx.drawImage(bg, 0, 0); // 原尺寸绘制背景
 
-    let y = 220; // 避开压条文字
+    let y = 340; // 避开压条图层高度
     ctx.fillStyle = "#000";
-    ctx.font = "22px Courier New";
-    ctx.fillText(`过关方式 ${data.guoguan}    1倍    合计 ${data.jine}元`, 30, y);
-    y += 38;
+    ctx.font = "26px Courier New";
+    ctx.fillText(`过关方式 ${data.guoguan}    1倍    合计 ${data.jine}元`, 50, y);
+    y += 46;
 
-    ctx.font = "20px Courier New";
+    ctx.font = "24px Courier New";
     data.matches.forEach((match, i) => {
-      ctx.fillText(`第${i + 1}场 ${match.weekday}${match.code} ${match.let}`, 30, y);
-      y += 28;
-      ctx.fillText(`主队：${match.home} vs 客队：${match.away}`, 30, y);
-      y += 28;
-      ctx.fillText(`${match.bet}@${match.odds}`, 30, y);
-      y += 36;
+      ctx.fillText(`第${i + 1}场 ${match.weekday}${match.code} ${match.let}`, 50, y);
+      y += 32;
+      ctx.fillText(`主队：${match.home} vs 客队：${match.away}`, 50, y);
+      y += 32;
+      ctx.fillText(`${match.bet}@${match.odds}`, 50, y);
+      y += 44;
     });
 
-    ctx.font = "18px Courier New";
-    ctx.fillText("（选项固定奖金金额为每1元投注对应的奖金金额）", 30, y);
-    y += 26;
-    ctx.fillText(`本票最高可能固定奖金：${data.max_bonus}`, 30, y);
-    y += 26;
-    ctx.fillText(`单倍注数：${data.zhushu_info}`, 30, y);
-    y += 34;
+    ctx.font = "22px Courier New";
+    ctx.fillText("（选项固定奖金金额为每1元投注对应的奖金金额）", 50, y);
+    y += 32;
+    ctx.fillText(`本票最高可能固定奖金：${data.max_bonus}`, 50, y);
+    y += 32;
+    ctx.fillText(`单倍注数：${data.zhushu_info}`, 50, y);
+    y += 44;
 
     for (let i = 0; i < 10; i++) {
-      ctx.fillText("********************", 30, y);
-      y += 20;
+      ctx.fillText("********************", 50, y);
+      y += 24;
     }
 
-    ctx.fillText(`感谢您为公益事业贡献 ${data.gongyi}元`, 170, y);
-    y += 24;
-    ctx.fillText(`${data.city}`, 260, y);
-    y += 24;
-    ctx.fillText(`${data.print_time}`, 400, y);
+    ctx.fillText(`感谢您为公益事业贡献 ${data.gongyi}元`, 220, y);
+    y += 28;
+    ctx.fillText(`${data.city}`, 310, y);
+    y += 28;
+    ctx.fillText(`${data.print_time}`, 480, y);
 
     const barcode = new Image();
     barcode.src = "images/barcode/条码图1.png";
     barcode.onload = () => {
-      ctx.drawImage(barcode, 30, y + 8, 540, 60);
+      ctx.drawImage(barcode, 50, y + 10, 520, 60);
     };
   };
 }
