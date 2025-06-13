@@ -29,10 +29,60 @@
 
     <button onclick="generate()">生成票据</button>
     <br/><br/>
-    <canvas id="canvas" width="600" height="1000"></canvas>
+    <canvas id="ticketCanvas" width="600" height="1000"></canvas>
     <br/>
     <button onclick="download()">下载图片</button>
   </div>
-  <script src="script.js"></script>
+
+  <!-- 插入脚本：绘图函数 -->
+  <script src="canvas-draw.js"></script>
+
+  <!-- 插入主逻辑（你可移到 main.js） -->
+  <script>
+    function generate() {
+      const text = document.getElementById("matchText").value.trim();
+      const lines = text.split("\n");
+      const matches = [];
+
+      for (let i = 0; i < lines.length; i += 2) {
+        const line1 = lines[i];
+        const line2 = lines[i + 1] || "";
+
+        const match = {
+          index: i / 2 + 1,
+          weekday: line1.match(/周\S+/)?.[0] || "",
+          code: line1.match(/\\d{3}/)?.[0] || "",
+          let: line1.split(" ").slice(3).join(" ").trim(),
+          home: line2.match(/主队：(.*?)\\s+vs/i)?.[1] || "",
+          away: line2.match(/客队：(.*?)\\s+/i)?.[1] || "",
+          bet: line2.match(/(胜|平|负)/)?.[1] || "",
+          odds: line2.match(/@(\\d+\\.\\d+)/)?.[1] + \"元\" || ""
+        };
+        matches.push(match);
+      }
+
+      const data = {
+        guoguan: document.getElementById(\"guoguan\").value,
+        beishu: 1,
+        jine: document.getElementById(\"jine\").value,
+        max_bonus: document.getElementById(\"bonus\").value + \"元\",
+        zhushu_info: document.getElementById(\"zhushu\").value,
+        gongyi: \"0.42\", // 默认值
+        city: \"北京\",
+        print_time: \"2025/06/13 14:00:00\",
+        matches: matches
+      };
+
+      drawTicket(data);
+    }
+
+    function download() {
+      const canvas = document.getElementById(\"ticketCanvas\");
+      const link = document.createElement(\"a\");
+      link.download = \"ticket.png\";
+      link.href = canvas.toDataURL();
+      link.click();
+    }
+  </script>
 </body>
 </html>
