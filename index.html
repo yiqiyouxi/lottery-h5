@@ -2,87 +2,123 @@
 <html lang="zh">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>彩票出票</title>
   <link rel="stylesheet" href="style.css" />
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f8f8f8; }
+    h1 { color: #000; }
+    .match-card { background: #fff; border: 1px solid #ddd; padding: 10px; margin-bottom: 10px; }
+    .bets button { margin: 5px; padding: 5px 10px; }
+    #selected { background: #fff; padding: 10px; margin-top: 20px; border: 1px solid #ccc; }
+    canvas { border: 1px solid #999; margin-top: 20px; }
+    .btn-red { background-color: red; color: white; border: none; padding: 10px 20px; cursor: pointer; }
+    .remove-btn { color: red; cursor: pointer; margin-left: 10px; }
+  </style>
 </head>
 <body>
-  <div class="container">
-    <h1>生成彩票票据</h1>
+  <h1>生成彩票票据</h1>
 
-    <textarea id="matchText" placeholder="请输入比赛信息，例如：
-第1场 周六001 主队：恒大 vs 客队：国米 胜@1.70
-第2场 周六002 主队：拜仁 vs 客队：皇马 负@1.90
-"></textarea>
+  <div id="matchList"></div>
 
+  <div id="selected">
+    <strong>已选择：</strong>
+    <ul id="selectedBets"></ul>
     <label>过关方式：</label>
-    <input id="guoguan" placeholder="如 2x1" />
-
+    <input id="guoguan" value="2x1" />
     <label>金额（元）：</label>
-    <input id="jine" placeholder="如 2" />
-
+    <input id="jine" value="2" />
     <label>最高奖金（元）：</label>
-    <input id="bonus" placeholder="如 5.98" />
-
+    <input id="bonus" value="5.98" />
     <label>注数说明：</label>
-    <input id="zhushu" placeholder="如 2x1×1注；共1注" />
-
-    <button onclick="generate()">生成票据</button>
+    <input id="zhushu" value="2x1×1注；共1注" />
     <br/><br/>
-    <canvas id="ticketCanvas" width="600" height="1000"></canvas>
-    <br/>
-    <button onclick="download()">下载图片</button>
+    <button class="btn-red" onclick="generate()">生成票据</button>
   </div>
 
-  <!-- 插入脚本：绘图函数 -->
+  <canvas id="ticketCanvas" width="600" height="1000"></canvas>
+  <br/>
+<button onclick="downloadTicketImage()">下载票据图片</button>
+  <script src="script.js"></script>
   <script src="canvas-draw.js"></script>
-
-  <!-- 插入主逻辑（你可移到 main.js） -->
   <script>
+    const matches = [
+      { code: "周五001", home: "江原FC", away: "全北现代", odds: { 胜: "3.40", 平: "3.06", 负: "1.97" } },
+      { code: "周五002", home: "波特兰", away: "圣何塞", odds: { 胜: "1.74", 平: "3.85", 负: "3.40" } },
+      { code: "周六001", home: "横滨FC", away: "川崎前锋", odds: { 胜: "3.52", 平: "3.28", 负: "1.85" } },
+      { code: "周六002", home: "鹿岛鹿角", away: "广岛三箭", odds: { 胜: "2.05", 平: "3.20", 负: "2.30" } },
+      { code: "周六003", home: "名古屋鲸", away: "大阪樱花", odds: { 胜: "2.50", 平: "3.10", 负: "2.60" } }
+    ];
+
+    const matchList = document.getElementById("matchList");
+    const selectedBets = [];
+    const selectedList = document.getElementById("selectedBets");
+
+    function renderMatches() {
+      matchList.innerHTML = "";
+      matches.forEach((match, index) => {
+        const div = document.createElement("div");
+        div.className = "match-card";
+        div.innerHTML = `<div class="match-header">${match.code} ${match.home} vs ${match.away}</div>
+          <div class="bets">
+            <button onclick="selectBet(${index}, '胜')">胜@${match.odds.胜}</button>
+            <button onclick="selectBet(${index}, '平')">平@${match.odds.平}</button>
+            <button onclick="selectBet(${index}, '负')">负@${match.odds.负}</button>
+          </div>`;
+        matchList.appendChild(div);
+      });
+    }
+
+    function selectBet(i, type) {
+      const match = matches[i];
+      const id = `${match.code}_${type}`;
+      if (selectedBets.some(b => b.id === id)) return;
+      selectedBets.push({
+        id,
+        index: selectedBets.length + 1,
+        code: match.code.replace(/[^\d]/g, ""),
+        weekday: match.code.slice(0, 2),
+        home: match.home,
+        away: match.away,
+        let: "",
+        bet: type,
+        odds: match.odds[type]
+      });
+      renderSelected();
+    }
+
+    function removeBet(id) {
+      const idx = selectedBets.findIndex(b => b.id === id);
+      if (idx !== -1) selectedBets.splice(idx, 1);
+      renderSelected();
+    }
+
+    function renderSelected() {
+      selectedList.innerHTML = "";
+      selectedBets.forEach(bet => {
+        const li = document.createElement("li");
+        li.innerHTML = `${bet.weekday}${bet.code} ${bet.home} vs ${bet.away} → ${bet.bet}@${bet.odds}
+          <span class='remove-btn' onclick="removeBet('${bet.id}')">×</span>`;
+        selectedList.appendChild(li);
+      });
+    }
+
     function generate() {
-      const text = document.getElementById("matchText").value.trim();
-      const lines = text.split("\n");
-      const matches = [];
-
-      for (let i = 0; i < lines.length; i += 2) {
-        const line1 = lines[i];
-        const line2 = lines[i + 1] || "";
-
-        const match = {
-          index: i / 2 + 1,
-          weekday: line1.match(/周\S+/)?.[0] || "",
-          code: line1.match(/\\d{3}/)?.[0] || "",
-          let: line1.split(" ").slice(3).join(" ").trim(),
-          home: line2.match(/主队：(.*?)\\s+vs/i)?.[1] || "",
-          away: line2.match(/客队：(.*?)\\s+/i)?.[1] || "",
-          bet: line2.match(/(胜|平|负)/)?.[1] || "",
-          odds: line2.match(/@(\\d+\\.\\d+)/)?.[1] + \"元\" || ""
-        };
-        matches.push(match);
-      }
-
       const data = {
-        guoguan: document.getElementById(\"guoguan\").value,
+        guoguan: document.getElementById("guoguan").value,
         beishu: 1,
-        jine: document.getElementById(\"jine\").value,
-        max_bonus: document.getElementById(\"bonus\").value + \"元\",
-        zhushu_info: document.getElementById(\"zhushu\").value,
-        gongyi: \"0.42\", // 默认值
-        city: \"北京\",
-        print_time: \"2025/06/13 14:00:00\",
-        matches: matches
+        jine: document.getElementById("jine").value,
+        max_bonus: document.getElementById("bonus").value,
+        zhushu_info: document.getElementById("zhushu").value,
+        gongyi: "5.46",
+        city: "北京省",
+        print_time: "25/01/08 11:51:25",
+        matches: selectedBets
       };
-
       drawTicket(data);
     }
 
-    function download() {
-      const canvas = document.getElementById(\"ticketCanvas\");
-      const link = document.createElement(\"a\");
-      link.download = \"ticket.png\";
-      link.href = canvas.toDataURL();
-      link.click();
-    }
+    renderMatches();
   </script>
 </body>
 </html>
